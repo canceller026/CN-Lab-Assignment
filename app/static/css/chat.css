@@ -1,0 +1,159 @@
+  .container-1{
+    display:flex;
+    justify-content: center;
+    height: 46.5em;
+    width:96em;
+    padding:0;
+    margin:0;
+  }
+  .chatlist{
+    height:100%;
+    width:20%;
+    background-color: beige;
+    border-right: solid 1px black;
+  }
+  .chatbox{
+    height:100%;
+    width:80%;
+    background-color: yellow;
+
+  }
+  /*Chatbox*/
+  /*info chatbox*/
+  .holder {
+    width:100%;
+    height: 10%;
+    flex-direction: column;
+    background-color: black;
+
+  }
+  .details {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding:0.5em 1em;
+    float:left;
+  }
+  
+  .menu {
+    color: white;
+    font-weight: bold;
+    float:right;
+    padding:0.7em 1em;
+    font-size:25px;
+  }
+  
+  .details img {border-radius: 50%;height: 48px;border: 2px solid white;box-shadow: 0px 2px 2px 0px #0000002e;}
+  
+  .contacto {
+    color: white;
+    font-size: 18px;
+  }
+  
+  .contacto .name {
+    font-weight: bold;
+  }
+  
+  .contacto .status {font-size: 0.75em;}
+  /*Content chatbox*/
+  .content {
+    height:80%;
+    background-color: beige;
+    flex: 1;
+  }
+  /*Input chatbox*/
+  .entry {
+    background-color: #c8c8b2;
+    display: flex;
+    padding: 8px;
+    align-items: center;
+    height: 10%;
+  }
+  
+  #msg {
+    transition: all 0.3s;
+    flex: 1;
+    margin-right: 10px;
+    margin-left: 0px;
+    border-radius: 5px;
+    border: none;
+    border: 1px solid white;
+    color: gray;
+    height: 45px;
+
+  }
+  
+  #msg:focus {
+    border: 2px solid gray;
+    outline: none;
+    color: black;
+    height: 45px;
+  }
+  .send {
+    height: 45px;
+    width: 45px;
+    border:none;
+    border-radius: 10px;
+    transition:all 0.3s;
+    font-size: 16px;
+    cursor:pointer;
+  }
+  .send:hover{
+    color: #604bcb;
+    background-color: white;
+  }
+  /*--------------------------*/
+  /*Chat list*/
+  form.example input[type=text] {
+    padding: 10px;
+    font-size: 17px;
+    border: 1px solid #f1f1f1;
+    float: left;
+    width: 75%;
+    height:38px;
+    background: #f1f1f1;
+    border-radius: 5px 0px 0px 5px;
+    margin-left:7px;
+  }
+  
+  /* Style the submit button */
+  form.example button {
+    float: left;
+    width: 20%;
+    height:38px;
+    padding: 5px;
+    background-color: black;
+    color: white;
+    font-size: 17px;
+    border: 1px solid grey;
+    border-radius: 0px 5px 5px 0px;
+    cursor: pointer;
+  }
+
+  form.example button:hover {
+    background: #0b7dda;
+  }
+  
+  /* Clear floats */
+  form.example::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  .item{
+    width:100%;
+    height:4.5em;
+    margin:15px 0px;
+    padding:10px 0px;
+    border-radius: 5px;
+    background-color: #b3800049;
+    display:flex;
+  }
+  .item img {
+    border-radius: 50%;
+    height: 48px;
+    border: 2px solid white;
+    box-shadow: 0px 2px 2px 0px #0000002e;
+    margin:0px 10px;
+  }
+/*--------------------------*/

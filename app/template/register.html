@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="../static/css/login.css">
 
-    <title>LOGIN</title>
+    <title>REGISTER</title>
   </head>
   <body>
     <div class="row">
@@ -38,18 +38,27 @@
          
         <div class="login">
             <h2 style="color:red;margin-top:-50px;margin-bottom:50px;"><b>HELL WEBCHAT</b></h2>
-            <h3><b>LOGIN</b></h3>
+            <h3><b>REGISTER</b></h3>
             <form>
-                  <div class="form-group">
+                <div class="form-group">
                     <label for=""><i class="zmdi zmdi-account material-icons-name"></i></label>
+                    <input
+                      type="text"
+                      name="staff_id"
+                      id="your_name"
+                      placeholder="Full name"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for=""><i class="zmdi zmdi-account-o material-icons-name"></i></label>
                     <input
                       type="text"
                       name="staff_id"
                       id="your_name"
                       placeholder="Username"
                     />
-                  </div>
-                  <div class="form-group">
+                </div>
+                <div class="form-group">
                     <label for=""><i class="zmdi zmdi-lock"></i></label>
                     <input
                       type="password"
@@ -57,8 +66,17 @@
                       id="your_pass"
                       placeholder="Password"
                     />
-                  </div>
-                  <div class="tick">
+                </div>
+                <div class="form-group">
+                    <label for=""><i class="zmdi zmdi-check-all"></i></label>
+                    <input
+                      type="password"
+                      name="password"
+                      id="your_pass"
+                      placeholder="Confirm Password"
+                    />
+                </div>
+                <div class="tick">
                     <input
                       type="checkbox"
                       name="remember-me"
@@ -66,22 +84,19 @@
                       class="agree-term"
                     />
                     <label for="remember-me" class="label-agree-term">
-                        <span><span></span></span>Remember me ?
+                        <span><span></span></span>I agree to the terms and conditions
                     </label>
-                  </div>
-                  <div class="form-button">
+                </div>
+                <div class="form-button">
                     <input
                       type="submit"
                       name="signin"
                       id="signin"
                       class="form-submit btn-secondary"
-                      value="Log In"
+                      value="Register"
                     />
-                  </div>
-                  <div class="form-button__register">
-                      Don't have an account ?
-                      <a href="register.html" style="text-decoration: none">Sign Up</a>
-                  </div>
+                </div>
+                
             </form>
          </div>
     </div>
