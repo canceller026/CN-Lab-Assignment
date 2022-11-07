@@ -1,3 +1,7 @@
+body{
+    background-color: #2d2b40;
+    color:white;
+}
 .container{
     width:150vh;
     text-align: center;
@@ -5,12 +9,13 @@
 }
 .container h1{
     margin:1em;
+    font-weight: bold;
 }
 .container button{
     width:250px;
     height:60px;
     border-radius: 15px;
-    border: solid 1px #7481fb;
-    background-color:beige;
+    border: solid 1px transparent;
+    background-color: beige ;
     font-weight: bold;
 }

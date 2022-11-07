@@ -1,3 +1,7 @@
+body{
+    background-color: #2d2b40;
+    color:white;
+}
 .container{
     display:flex;
     width:100%;
