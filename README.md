@@ -42,9 +42,3 @@ Running the application on your local.
 python manage.py runserver
 ```
 
-## **IMPORTTANT** 
-Whenever you install packages in order to implement the functions, you need to state that information of packages installed in the **requirements.txt** file by running the following command 
-
-```
-pip freeze > requirements.txt
-```
