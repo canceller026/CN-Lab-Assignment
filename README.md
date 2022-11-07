@@ -42,3 +42,8 @@ Running the application on your local.
 python manage.py runserver
 ```
 
+Create account
+```
+python manage.py createsuperuser
+```
+Then fill in the in need information
