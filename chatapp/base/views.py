@@ -6,3 +6,7 @@ from django.urls import reverse_lazy
 @login_required(login_url=('login'))
 def chat(request):
     return render(request, 'chat.html')
+    
+@login_required(login_url=('login'))
+def index(request):
+    return render(request, 'index.html')

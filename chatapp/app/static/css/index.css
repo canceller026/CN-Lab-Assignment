@@ -1,0 +1,16 @@
+.container{
+    width:150vh;
+    text-align: center;
+    margin-top:15em;
+}
+.container h1{
+    margin:1em;
+}
+.container button{
+    width:250px;
+    height:60px;
+    border-radius: 15px;
+    border: solid 1px #7481fb;
+    background-color:beige;
+    font-weight: bold;
+}

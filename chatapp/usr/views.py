@@ -21,7 +21,7 @@ def loginView(request):
 
         if user is not None:
             login(request, user)
-            return redirect('/chat')
+            return redirect('/')
         else:
             messages.info(request, "Username or password is incorrect")
             return redirect('/login')
@@ -31,11 +31,10 @@ def loginView(request):
 def register(request):
     return render(request, 'register.html')
 
-def logout(request):
-    if request.user.is_authenticated:
-        logout(request)
+def logout_page(request):
 
-    return redirect(reverse('login'))
+    logout(request)
+    return redirect('/')
 """
 
 """
