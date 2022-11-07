@@ -47,3 +47,6 @@ Create account
 python manage.py createsuperuser
 ```
 Then fill in the in need information
+```
+python manage.py migrate
+```
