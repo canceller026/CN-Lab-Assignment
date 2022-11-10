@@ -1,4 +1,5 @@
 {% load static %}
+{% load crispy_forms_tags %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -38,16 +39,21 @@
         </div>
          
         <div class="login">
-            <h2 style="color:red;margin-top:-50px;margin-bottom:50px;"><b>HELL WEBCHAT</b></h2>
+            <h2 style="color:red;margin-top:-50px;margin-bottom:20px;"><b>HELL WEBCHAT</b></h2>
             <h3><b>REGISTER</b></h3>
             <form method="POST" class="register-form" id="register-form">
               {% csrf_token %}
-                <div class="form-group">
+              {{form.username|as_crispy_field}}
+	            {{form.password1|as_crispy_field}}
+              {{form.password2|as_crispy_field}}
+	            {{form.email|as_crispy_field}}
+              <button class="submitbtn btn-secondary" type="submit">Register</button>
+                <!--<div class="form-group">
                     <label for=""><i class="zmdi zmdi-account material-icons-name"></i></label>
                     <input
                       type="text"
-                      name="username"
-                      id="your_name"
+                      name="yourname"
+                      id="yourname"
                       placeholder="Full name"
                     />
                 </div>
@@ -55,8 +61,8 @@
                     <label for=""><i class="zmdi zmdi-account-o material-icons-name"></i></label>
                     <input
                       type="text"
-                      name="staff_id"
-                      id="your_name"
+                      name="username"
+                      id="username"
                       placeholder="Username"
                     />
                 </div>
@@ -65,7 +71,7 @@
                     <input
                       type="password"
                       name="password"
-                      id="your_pass"
+                      id="password"
                       placeholder="Password"
                     />
                 </div>
@@ -73,8 +79,8 @@
                     <label for=""><i class="zmdi zmdi-check-all"></i></label>
                     <input
                       type="password"
-                      name="password"
-                      id="your_pass"
+                      name="repassword"
+                      id="repassword"
                       placeholder="Confirm Password"
                     />
                 </div>
@@ -97,7 +103,7 @@
                       class="form-submit btn-secondary"
                       value="Register"
                     />
-                </div>
+                </div>-->
                 
             </form>
          </div>

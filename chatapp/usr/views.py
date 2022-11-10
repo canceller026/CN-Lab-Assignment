@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.urls import reverse
+from .forms import NewUserForm
+
+
 
 # Create your views here.
 
@@ -28,8 +30,19 @@ def loginView(request):
     return render(request, "login.html")
 
 
-def register(request):
-    return render(request, 'register.html')
+def registerView(request):
+    if request.method=="POST":
+        form = NewUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = NewUserForm()
+    return render(request,'register.html',{"form":form})
+    #if request.method =="POST":
+    #    name = request.POST['yourname']
+    #    print(name)
+    #return render(request, 'register.html')
 
 def logout_page(request):
 
