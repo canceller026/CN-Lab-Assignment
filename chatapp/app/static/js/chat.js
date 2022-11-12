@@ -1,37 +1,65 @@
-/*List friend*/
-let person = [
-    {
-        id:01,
-        name: "Gojo Satoru",
-        avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQNhdbD8W2BUsdE3scIMBRjsbT13R4b86gmX3OEmYu8NsSWTkfPiCBB0vR9VR2j3SC71w&usqp=CAU",
-        status: "Active 17 minutes ago"
-    },
-    {
-        id:02,
-        name: "Uzumaki Naruto",
-        avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9z5hgzxGR_PkmFy6mp9ohpJLdnuknkEEY1A&usqp=CAU",
-        status: "Active"
-    },
-    {
-        id:03,
-        name: "Monkey .D. Luffy",
-        avatar: "https://gamek.mediacdn.vn/133514250583805952/2022/5/18/photo-1-16528608926331302726659.jpg",
-        status: "Active 2 hours ago"
-    },  
-];
-/*Display list friend*/
-function Chat(){
-    for(let i = 0; i<=person.length; i++){
-        document.getElementById("demo").innerHTML += `
-            <div class="item" id="${person[i].id}">
-                <img src=${person[i].avatar} alt="">
-                <div class="contacto">
-                    <div class="name">${person[i].name}</div>
-                    <div class="status">${person[i].status}</div>
-                </div>
-            </div>
-        
-        `;
-    };
+const ls = localStorage.getItem("selected");
+let selected = false;
+var list = document.querySelectorAll(".list"),
+    content = document.querySelector(".content"),
+    input = document.querySelector(".message-footer input"),
+    open = document.querySelector(".open a");
+
+//===============================================//
+// show box chat
+function chatbox() {
+  if(ls != null) {
+    selected = true;
+    click(list[ls], ls);
+  }
+  if(!selected) {
+    click(list[0], 0);
+  }
+
+  list.forEach((l,i) => {
+    l.addEventListener("click", function() {
+      click(l, i);
+    });
+  });
+  
+  try {
+    document.querySelector(".list.active").scrollIntoView(true);
+  }
+  catch {}
+  
 }
-Chat();
+chatbox();
+
+//list click
+function click(l, index) {
+  list.forEach(x => { x.classList.remove("active"); });
+  if(l) {
+    l.classList.add("active");
+    document.querySelector("sidebar").classList.remove("opened");
+    open.innerText="UP";
+    const img = l.querySelector("img").src,
+          user = l.querySelector(".user").innerText,
+          time = l.querySelector(".time").innerText;
+
+    content.querySelector("img").src = img;
+    content.querySelector(".info .user").innerHTML = user;
+    content.querySelector(".info .time").innerHTML = time;
+
+    const inputPH = input.getAttribute("data-placeholder");
+    input.placeholder = inputPH.replace("{0}", user.split(' ')[0]);
+
+    document.querySelector(".message-wrap").scrollTop = document.querySelector(".message-wrap").scrollHeight;
+    
+    localStorage.setItem("selected", index);
+  }
+}
+//===============================================//
+
+open.addEventListener("click", (e) => {
+  const sidebar = document.querySelector("sidebar");
+  sidebar.classList.toggle("opened");
+  if(sidebar.classList.value == 'opened')
+    e.target.innerText = "DOWN";
+  else
+    e.target.innerText = "UP";
+});
