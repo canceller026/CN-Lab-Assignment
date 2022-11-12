@@ -219,8 +219,10 @@ img {
   cursor:pointer;
   margin-left:5px;
 }
-.send:hover{
+.send i{
+  color:black;
+}
+.send i:hover{
   color: #604bcb;
-  background-color: white;
 }
 
