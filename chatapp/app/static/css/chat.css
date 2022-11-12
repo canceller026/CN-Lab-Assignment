@@ -18,8 +18,9 @@
     width:80%;
   }
   /*Chatbox*/
+  
   /*info chatbox*/
-  .holder {
+  .holder, #holder {
     width:100%;
     height: 10%;
     flex-direction: column;
@@ -154,6 +155,7 @@
   .item img {
     border-radius: 50%;
     height: 48px;
+    width:48px;
     border: 2px solid white;
     box-shadow: 0px 2px 2px 0px #0000002e;
     margin:0px 10px;

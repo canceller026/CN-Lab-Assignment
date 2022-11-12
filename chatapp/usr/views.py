@@ -44,10 +44,8 @@ def registerView(request):
     #    print(name)
     #return render(request, 'register.html')
 
-def logout_page(request):
+def logoutView(request):
+    if request.user.is_authenticated:
+        logout(request)
 
-    logout(request)
-    return redirect('/')
-"""
-
-"""
+    return redirect('login')
