@@ -1,92 +1,56 @@
-import threading  # Using multi-thread
 import socket
-from datetime import datetime
+import json
+import threading
 
-# create a list of user
-clients = []
-total = 0
-m = []
-count = 0
-# main function
+from base import Peer
 
+class Server(Peer):
+    """ Server implementation of P2P chat system. """
+    def __init__(self, serverhost='localhost', serverport=30000): #server IP
+        super(Server, self).__init__(serverhost, serverport)
+        msg_func_handle = {
+            'REGISTER': self.register,
+            'PEERLIST': self.listpeer,
+            'EXIT_NETWORK': self.exit_network,
+        }
+        for message_type, func in msg_func_handle.items():
+            self.func_assign(message_type, func)      
 
-def main():
-    global count
-    global total
-    daytime = datetime.now().strftime('%d/%m/%Y %H:%M')
+    def exit_network(self, msgdata):
+        peername = msgdata['peername']
+        if peername in self.peerlist:
+            del self.peerlist[peername]
 
-    # create object to pass parameter : address, TCP
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def register(self, msgdata):
+        peername = msgdata['peername']
+        host = msgdata['host']
+        port = msgdata['port']
+        if peername in self.peerlist:  # Name already taken
+            self.socket_sending((host, port), msgtype='REGISTER_ERROR', msgdata={})
+        else:
+            self.peerlist[peername] = (host, port)
+            self.socket_sending(self.peerlist[peername], msgtype='REGISTER_SUCCESS', msgdata={})
 
-    # Connect to server
-    try:
-        server.bind((socket.gethostbyname(socket.gethostname()), 7777))
-        server.listen()  # Server is now ready to connect
-        print(f'\nOpen chat on {daytime}')
-        print("Wait for clients to connect")
-    except:
-        #  Cant connect to the server
-        return print('\nCant start server\n')
+    def listpeer(self, msgdata):  
+        peername = msgdata['peername']
+        if peername in self.peerlist:
+            data = {'peerlist': self.peerlist}
+            self.socket_sending(self.peerlist[peername], msgtype='PEERLIST', msgdata=data)
 
-    # Accept connection
-    while True: 
-        client, addr = server.accept()  # Connection return addresses
-        clients.append(client)  # Add client into client list
-        total = total + 1
-        print('\nNew client is ' + 'CONNECTED. ' + f'Total: {total} clients!')
+    
 
-        if count != 0:
-            client.send(bytes('\n', encoding="utf-8"))
-            for i in range(count):
-                client.send(m[i])
-                client.send(bytes('\n\n', encoding="utf-8"))
-
-        thread = threading.Thread(target=messagesTreatment, args=[client])
-        thread.start()
-
-
-def messagesTreatment(client):  # Listen to client's chat
-    global count
-    check = False
-    while True:
-        try:
-            if(check == False):
-                nome = client.recv(2048)
-                broadcast(nome, client)
-                check = True
-            else:
-                msg = client.recv(2048)
-                count = count + 1
-                m.append(msg)
-            # Messages are send to all clients
-                broadcast(msg, client)
-        except:
-            deleteClient(client)
-            break 
+    def run(self):
+        t = threading.Thread(target=self.receive)
+        t.daemon = True
+        t.start()
+        print("Type <end server> to stop the server.")
+        while True:
+            cmd = input()
+            if cmd=='end server':
+                break
 
 
-def broadcast(msg, client):
-    for clientItem in clients: 
-        if clientItem != client:
-            try:
-                clientItem.send(msg)
-            except:
-                deleteClient(clientItem)
-
-
-def deleteClient(client):
-    global total
-    global count
-    total = total - 1
-    if total == 0:
-        print('\nA client has' + ' DISCONNECTED. ' + f'Total: {total} members!')
-        print('\nThere is no clients in the chat now')
-        m.clear()
-        count = 0
-    else:
-        print('\nA client has' + ' DISCONNECTED. ' + f'Total: {total} members!')
-
-    clients.remove(client)
-
-#run this function
-main()
+if __name__ == '__main__':
+    server = Server()
+    print(server.socket)
+    server.run()
