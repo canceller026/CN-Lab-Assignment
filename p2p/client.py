@@ -97,6 +97,11 @@ class Client(Peer):
         data = {'peername': self.name}
         self.socket_sending(self.server_info, msgtype='PEERLIST', msgdata=data)
 
+    def send_listpeer1(self):
+        """ Send a request to server to get all peers information. """
+        data = {'peername': self.name}
+        self.socket_sending(self.server_info, msgtype='PEERLIST', msgdata=data)
+
     #Display all peers available
     def display_all_peers(self, msgdata):
         """ Processing received message from server:
@@ -106,6 +111,16 @@ class Client(Peer):
         # print(msgdata['peerlist'])
         for peername, peer_info in msgdata['peerlist'].items():
             print('peername: ' + peername)
+
+    #Display all peers available
+    def display_all_peers1(self, msgdata):
+        """ Processing received message from server:
+            Output information about all peers that have been logined on the server. """
+        self.connectable_peer = {key:tuple(value) for key, value in msgdata['peerlist'].items()}
+        print('display all peers:')
+        # print(msgdata['peerlist'])
+        for peername, peer_info in msgdata['peerlist'].items():
+            print('peername: ' + peername + ' : ' + peer_info["port"])
 
     #Show list connected peers
     def friend_list(self):
@@ -462,11 +477,13 @@ class Client(Peer):
 
 
 if __name__ == '__main__':
-    try:
-        serverport = int(input('Please choose a serverport (1024 -> 49151): '))
-        peername = input('Type in your name: ')
-    except:
-        print('ERROR when using username or port')
-    else:
-        client = Client(peername=peername, serverport=serverport)
-        client.run()
+    while True:
+        try:
+            serverport = int(input('Please choose a serverport (1024 -> 49151): '))
+            peername = input('Type in your name: ')
+            client = Client(peername=peername, serverport=serverport)
+            client.run()
+        except WindowsError as e:
+            if e.winerror == 10048:
+                print('ERROR when using username or port')
+                print('Please redo in again')
