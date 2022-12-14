@@ -436,6 +436,11 @@ class Client(Peer):
                     peername = input("Please input the peer you want to chat: ")
                     while True:
                         message = input("Type the message <Type [!END] to stop chat> : ")
+                        if message == '!END':
+                            break
+                        elif message == '!SWITCH':
+                            message = ""
+                            peername = input("Please input the peer you want to chat: ")
                         self.send_chat_message(peername, message)
                 case '8':
                     message = input("Type the message: ")
