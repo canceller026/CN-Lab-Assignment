@@ -9,20 +9,55 @@ cluster = MongoClient("mongodb+srv://thoxoantit2410:trungchanh2410@p2p-chat.psyo
 db = cluster["P2P-chat"]
 collection = db["userlist"]
 
+class ClientThread(threading.Thread):
+    def __init__(self,clientAddress,clientsocket):
+        threading.Thread.__init__(self)
+        self.csocket = clientsocket
+        print ("New connection added: ", clientAddress)
+
+        print ("Connection from : ", clientAddress)
+    
+
 class Server(Peer):
     """ Server implementation of P2P chat system. """
     def __init__(self, serverhost='localhost', serverport=30000): #server IP
-        super(Server, self).__init__(serverhost, serverport)
+        self.serverhost, self.serverport = serverhost, int(serverport)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.bind((serverhost, int(serverport)))
+        self.peerlist = {}
+        self.msg_func_handle = {}
         msg_func_handle = {
             'REGISTER': self.register,
             'LOGIN': self.login,
             'ACCEPT_ADDFRIEND':self.accept_addfriend,
             'PEERLIST': self.listpeer,
             'EXIT_NETWORK': self.exit_network,
+            'CONNECT':self.connect
         }
         for message_type, func in msg_func_handle.items():
             self.func_assign(message_type, func)      
 
+    def func_assign(self, message_type, func):
+        self.msg_func_handle[message_type] = func
+    
+    def classifier(self, msg):
+        type_ = msg['msgtype']
+        data_ = msg['msgdata']
+        self.msg_func_handle[type_](data_)
+    
+    def receive(self):
+        self.socket.listen()
+        while True:  #--
+            conn, addr = self.socket.accept()
+            buf = conn.recv(2048)
+            msg = json.loads(buf.decode('utf-8'))
+            self.classifier(msg)
+            newthread = ClientThread(addr, conn)
+            newthread.start()
+            print(threading.active_count())
+
+    def connect(self, msgdata):
+        pass
     def exit_network(self, msgdata):
         peername = msgdata['peername']
         if peername in self.peerlist:
@@ -91,21 +126,20 @@ class Server(Peer):
 
 
     def run(self, mode = 0):
-        t = threading.Thread(target=self.receive)
-        t.daemon = True
-        t.start()
-        print("Type <end server> to stop the server.")
-        result = collection.find({"username":"trungchanh"})
-        for results in result:
-            print(results["host"])
-        if (mode == 1):
-            print("DEBUG_MODE: ON")
-            while True:
-                cmd = input()
-                if cmd=='end server':
-                    break
-                if cmd == 'listpeer':
-                    print(self.listpeer)
+        while True:
+            self.receive()
+            
+            print("Type <end server> to stop the server.")
+            print(threading.active_count())
+            if (mode == 1):
+                print("DEBUG_MODE: ON")
+                while True:
+                    cmd = input()
+                    if cmd=='end server':
+                        break
+                    if cmd == 'thread':
+                        print(threading.active_count())
+        
 
 
 if __name__ == '__main__':

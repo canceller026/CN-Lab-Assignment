@@ -12,8 +12,14 @@ from base import Peer
 
 class Client(Peer):
     def __init__(self, peername=None, serverhost='localhost', serverport=40000, server_info=('localhost', 30000)): #custom server ip
-        super(Client, self).__init__(serverhost, serverport)
+        self.serverhost, self.serverport = serverhost, int(serverport)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.bind((serverhost, int(serverport)))
+        self.socket.listen(100)
+        self.peerlist = {}
+        self.msg_func_handle = {}
         self.server_info = server_info  # Server Address
+
         self.name = peername if peername is not None else ':'.join((serverhost, serverport))
         self.connectable_peer = {}
         friendlist:list = []
@@ -41,6 +47,21 @@ class Client(Peer):
         self.agree = None
         
         self.file_data = {}
+
+    def func_assign(self, message_type, func):
+        self.msg_func_handle[message_type] = func
+    
+    def classifier(self, msg):
+        type_ = msg['msgtype']
+        data_ = msg['msgdata']
+        self.msg_func_handle[type_](data_)
+    
+    def receive(self):
+        while True:  #--
+            conn, addr = self.socket.accept()
+            buf = conn.recv(2048)
+            msg = json.loads(buf.decode('utf-8'))
+            self.classifier(msg)
 
     #REGISTER =============================================================================================================
     def send_register(self):
@@ -75,6 +96,7 @@ class Client(Peer):
             'port': self.serverport
         }
         print(self.server_info)
+        
         self.socket_sending(self.server_info, msgtype='LOGIN', msgdata=data)
 
      #login success notification
@@ -421,6 +443,7 @@ class Client(Peer):
         t = threading.Thread(target=self.receive)  
         t.daemon=True
         t.start()
+        self.socket_connect(self.server_info, msgtype='CONNECT',msgdata={})
         
         self.menu()
         while True:
