@@ -7,7 +7,7 @@ import time
 import atexit
 
 from math import ceil
-from data import Peer
+from base import Peer
 
 
 class Client(Peer):
