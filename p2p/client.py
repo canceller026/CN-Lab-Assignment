@@ -7,12 +7,13 @@ import time
 import atexit
 
 from math import ceil
-from base import Peer
+from data import Peer
 
 
 class Client(Peer):
     def __init__(self, peername=None, serverhost='localhost', serverport=40000, server_info=('localhost', 30000)): #custom server ip
         super(Client, self).__init__(serverhost, serverport)
+        self.socket.listen()
         self.server_info = server_info  # Server Address
         self.name = peername if peername is not None else ':'.join((serverhost, serverport))
         self.connectable_peer = {}
@@ -74,8 +75,11 @@ class Client(Peer):
             'host': self.serverhost,
             'port': self.serverport
         }
+        connect = {'msg':'Hello from ' + self.name + ':' + str(self.serverhost) + " - " + str(self.serverport)}
         print(self.server_info)
         self.socket_sending(self.server_info, msgtype='LOGIN', msgdata=data)
+        self.server_sending(self.server_info, msgtype='CONNECT', msgdata = connect)
+        
 
      #login success notification
     def login_success(self, msgdata):

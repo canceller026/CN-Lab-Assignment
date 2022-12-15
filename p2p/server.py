@@ -1,7 +1,7 @@
 import socket
 import json
 import threading
-from base import Peer
+from data import Peer
 import pymongo
 from pymongo import MongoClient
 
@@ -19,9 +19,15 @@ class Server(Peer):
             'ACCEPT_ADDFRIEND':self.accept_addfriend,
             'PEERLIST': self.listpeer,
             'EXIT_NETWORK': self.exit_network,
+            'CONNECT':self.connect,
         }
         for message_type, func in msg_func_handle.items():
             self.func_assign(message_type, func)      
+    
+    def connect(self,msgdata):
+        msg = msgdata['msg']
+        print(msg)
+
 
     def exit_network(self, msgdata):
         peername = msgdata['peername']
@@ -91,21 +97,24 @@ class Server(Peer):
 
 
     def run(self, mode = 0):
-        t = threading.Thread(target=self.receive)
-        t.daemon = True
-        t.start()
-        print("Type <end server> to stop the server.")
-        result = collection.find({"username":"trungchanh"})
-        for results in result:
-            print(results["host"])
-        if (mode == 1):
-            print("DEBUG_MODE: ON")
-            while True:
-                cmd = input()
-                if cmd=='end server':
-                    break
-                if cmd == 'listpeer':
-                    print(self.listpeer)
+        while True:
+            self.socket.listen()
+            t = threading.Thread(target=self.receive)
+            t.daemon = True
+            t.start()
+            print("Type <end server> to stop the server.")
+            result = collection.find({"username":"trungchanh"})
+            for results in result:
+                print(results["host"])
+            if (mode == 1):
+                print("DEBUG_MODE: ON")
+                while True:
+                    #print(threading.enumerate())
+                    cmd = input()
+                    if cmd=='end server':
+                        break
+                    if cmd == 'listpeer':
+                        print(self.listpeer)
 
 
 if __name__ == '__main__':
