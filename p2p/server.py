@@ -1,7 +1,7 @@
 import socket
 import json
 import threading
-from data import Peer
+from base import Peer
 import pymongo
 from pymongo import MongoClient
 

@@ -68,11 +68,14 @@ class Client(Peer):
         """ Processing received message from server: Successful registration on the server. """
         self.send_listpeer()  # Update connected peer table
         print('register Successful.')
+        return 'register Successful'
+        
 
     #register failed notification
     def register_fail(self, msgdata):
         """ Processing received message from server: Registration failed on the server. """
         print('register Error.')
+        return 'register Error'
     #======================================================================================================================
 
     #LOGIN=================================================================================================================
@@ -96,11 +99,13 @@ class Client(Peer):
         print(self.friendlist)
         print('login Successful.')
         self.send_listpeer()
+        return 'login Successful'
 
     #login failed notification
     def login_fail(self, msgdata):
         """ Processing received message from server: Registration failed on the server. """
         print('login Error.')
+        return 'login Error'
     #======================================================================================================================
 
     #SHOW PEER LIST =======================================================================================================
@@ -140,6 +145,8 @@ class Client(Peer):
         if self.friend_list == []:
             print("You have no friend")
         print(self.friendlist)
+        return self.friendlist # return in list of friend
+        
 
     #Show list connected peers
     def list_connected_peer(self):
@@ -159,6 +166,7 @@ class Client(Peer):
         grouplist = msgdata['grouplist'].split(', ')
         for x in grouplist:
             print(x + " ")
+        return grouplist # Return in list of group chat
     #======================================================================================================================  
 
     #ADD FRIEND============================================================================================================
@@ -215,10 +223,12 @@ class Client(Peer):
         print('add friend request accept: {} --- {}:{}'.format(username, host, port))
         print(friend.split(', '))
         self.send_login()
+        return 'Add friend request accepted'
 
     def addfriend_refuse(self, msgdata):
         """ Processing received refuse chat request message from peer. """
         print('ADD FRIEND REFUSE!')
+        return 'Add friend request refused'
 
     def accept_request(self):
         self.agree = True
@@ -281,11 +291,13 @@ class Client(Peer):
         print('chat accept: {} --- {}:{}'.format(peername, host, port))
         self.peerlist[peername] = (host, port)
         self.send_listpeer()
+        return 'Chat request accepted'
     
     #Refuse request
     def chat_refuse(self, msgdata):
         """ Processing received refuse chat request message from peer. """
         print('CHAT REFUSE!')
+        return 'Chat request refused'
     
     def accept_request(self):
         self.agree = True
@@ -332,6 +344,7 @@ class Client(Peer):
         if peername in self.peerlist:
             print(peername +' : '+ msgdata['message'])
             # return self.message_format.format(peername=peername, message=msgdata['message'])
+            return msgdata['message']
     #======================================================================================================================
 
     #FILE TRANSFER ========================================================================================================
@@ -347,6 +360,7 @@ class Client(Peer):
             self.file_data[key] = [None] * filenum
         self.file_data[key][curnum] = filedata
         print(self.file_data[key])
+        return self.file_data[key]
 
     def send_file(self, peername, filename):
         try:
@@ -395,6 +409,7 @@ class Client(Peer):
         if peername in self.peerlist:
             print('Disconnected from {}'.format(peername))
             del self.peerlist[peername]   
+            return f'Disconnected from {peername}'
     #======================================================================================================================
 
 
@@ -412,10 +427,12 @@ class Client(Peer):
     #register success notification
     def create_groupchat_success(self, msgdata):
         print('Groupchat created Successful.')
+        return 'Groupchat created Successful.'
 
     #register failed notification
     def create_groupchat_error(self, msgdata):
         print('Groupchat created Error.')
+        return 'Groupchat created Error.'
 
     def addmember(self, peername, groupname):
         data = {
@@ -428,6 +445,7 @@ class Client(Peer):
 
     def add_member_success(self,msgdata):
         print("Member added successfully")
+        return 'Member added successfully'
 
     def group_chat(self,groupname, message):
         data={
@@ -455,6 +473,7 @@ class Client(Peer):
         """ Processing received chat message from peer."""
         peername = msgdata['peername']
         print(peername +' : '+ msgdata['message'])
+        return msgdata['message']
     #======================================================================================================================
 
 
