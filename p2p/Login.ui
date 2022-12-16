@@ -279,7 +279,7 @@
             </property>
            </spacer>
           </item>
-          <item row="7" column="0">
+          <item row="7" column="0" alignment="Qt::AlignHCenter">
            <widget class="QPlainTextEdit" name="port_text">
             <property name="minimumSize">
              <size>
@@ -305,7 +305,7 @@ background-color: rgb(85, 87, 83)</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="8" column="0" alignment="Qt::AlignHCenter">
            <widget class="QPushButton" name="start_button">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -365,13 +365,13 @@ background-color: rgb(85, 87, 83)</string>
            <widget class="QLabel" name="chat_lable_2">
             <property name="minimumSize">
              <size>
-              <width>600</width>
+              <width>1000</width>
               <height>60</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>600</width>
+              <width>1000</width>
               <height>60</height>
              </size>
             </property>
@@ -408,7 +408,7 @@ background-color: rgb(85, 87, 83)</string>
             </property>
            </spacer>
           </item>
-          <item row="5" column="0">
+          <item row="5" column="0" alignment="Qt::AlignHCenter">
            <widget class="QPlainTextEdit" name="username_text">
             <property name="minimumSize">
              <size>
@@ -434,7 +434,7 @@ background-color: rgb(85, 87, 83)</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="0">
+          <item row="10" column="0" alignment="Qt::AlignHCenter">
            <widget class="QWidget" name="horizontalWidget" native="true">
             <property name="minimumSize">
              <size>

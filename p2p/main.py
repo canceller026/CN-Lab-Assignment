@@ -139,6 +139,7 @@ class MainWindow(QMainWindow):
         self.request_button.clicked.connect(lambda: self.send_request())
         self.refresh_button.clicked.connect(lambda: self.real_fresh())
         self.group_button.clicked.connect(lambda: self.open_grouppage())
+        self.send_all_button.clicked.connect(lambda: self.send_to_all_message())
 
 
     def search_user(self):
@@ -296,6 +297,13 @@ class MainWindow(QMainWindow):
             self.file_plainTextEdit.setPlainText("")
         self.my_client.send_chat_message(self.fake_listpeer[self.friend_index-1], m_message)
 
+    def send_to_all_message(self):
+        m_message = self.message_plainTextEdit.toPlainText()
+        self.send_message()
+        for friend in self.friend_namelist:
+            if friend != self.fake_listpeer[self.friend_index-1]:
+                self.my_client.send_chat_message(friend, m_message)
+
     def read_message(self):
         if self.homepage_status:
             if self.my_client.new_message_check:
@@ -343,9 +351,7 @@ class MainWindow(QMainWindow):
 
     def change_1(self):
         self.friend_index = 1
-        print("--> ", self.fake_listpeer[self.friend_index-1])
         self.my_client.send_addfriend(self.fake_listpeer[self.friend_index-1])
-#        self.my_client.send_chat_request(self.fake_listpeer[self.friend_index-1])
         self.lable_name.setText(self.user_button_1.text())
         self.reset_chat()
         if self.friend_checklist[self.friend_index-1] == False:
@@ -359,7 +365,6 @@ class MainWindow(QMainWindow):
         self.friend_index = 2
         print("--> ", self.fake_listpeer[self.friend_index-1])
         self.my_client.send_addfriend(self.fake_listpeer[self.friend_index-1])
-#        self.my_client.send_chat_request(self.fake_listpeer[self.friend_index-1])
         self.lable_name.setText(self.user_button_2.text())
         self.reset_chat()
         if self.friend_checklist[self.friend_index-1] == False:
@@ -369,7 +374,6 @@ class MainWindow(QMainWindow):
     def change_3(self):
         self.friend_index = 3
         self.my_client.send_addfriend(self.fake_listpeer[self.friend_index-1])
-#        self.my_client.send_chat_request(self.fake_listpeer[self.friend_index-1])
         self.lable_name.setText(self.user_button_3.text())
         self.reset_chat()
         if self.friend_checklist[self.friend_index-1] == False:
@@ -379,7 +383,6 @@ class MainWindow(QMainWindow):
     def change_4(self):
         self.friend_index = 4
         self.my_client.send_addfriend(self.fake_listpeer[self.friend_index-1])
-#        self.my_client.send_chat_request(self.fake_listpeer[self.friend_index-1])
         self.lable_name.setText(self.user_button_4.text())
         self.reset_chat()
         if self.friend_checklist[self.friend_index-1] == False:
@@ -389,7 +392,6 @@ class MainWindow(QMainWindow):
     def change_5(self):
         self.friend_index = 5
         self.my_client.send_addfriend(self.fake_listpeer[self.friend_index-1])
-#        self.my_client.send_chat_request(self.fake_listpeer[self.friend_index-1])
         self.lable_name.setText(self.user_button_5.text())
         self.reset_chat()
         if self.friend_checklist[self.friend_index-1] == False:
@@ -399,7 +401,6 @@ class MainWindow(QMainWindow):
     def change_6(self):
         self.friend_index = 6
         self.my_client.send_addfriend(self.fake_listpeer[self.friend_index-1])
-#        self.my_client.send_chat_request(self.fake_listpeer[self.friend_index-1])
         self.lable_name.setText(self.user_button_6.text())
         self.reset_chat()
         if self.friend_checklist[self.friend_index-1] == False:
@@ -409,7 +410,6 @@ class MainWindow(QMainWindow):
     def change_7(self):
         self.friend_index = 7
         self.my_client.send_addfriend(self.fake_listpeer[self.friend_index-1])
-#        self.my_client.send_chat_request(self.fake_listpeer[self.friend_index-1])
         self.lable_name.setText(self.user_button_7.text())
         self.reset_chat()
         if self.friend_checklist[self.friend_index-1] == False:
