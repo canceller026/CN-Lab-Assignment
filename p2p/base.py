@@ -10,15 +10,15 @@ class Peer(object):
         self.socket.bind((serverhost, int(serverport)))
         self.peerlist = {}
         self.msg_func_handle = {}
-    
+
     def func_assign(self, message_type, func):
         self.msg_func_handle[message_type] = func
-    
+
     def classifier(self, msg):
         type_ = msg['msgtype']
         data_ = msg['msgdata']
         self.msg_func_handle[type_](data_)
-    
+
     def receive(self):
         while True:  #--
             conn, addr = self.socket.accept()

@@ -16,18 +16,10 @@ class Client(Peer):
         self.socket.listen()
         self.server_info = server_info  # Server Address
         self.name = peername if peername is not None else ':'.join((serverhost, serverport))
-        print(serverport)
         self.connectable_peer = {}
         self.friendlist:list = []
         self.grouplist:list = []
         self.logincheck = False
-
-        self.new_message_check = False
-        self.new_message = ""
-        self.load_peerlist = []
-        self.friend = []
-        self.connected = []
-        self.check_friend_request = None
 
         # example name: 192.168.0.1:30000
         msg_func_handle = {
@@ -57,7 +49,7 @@ class Client(Peer):
 
         # Variable checking request status --None--True--False
         self.agree = None
-
+        
         self.file_data = {}
 
     #REGISTER =============================================================================================================
@@ -87,7 +79,6 @@ class Client(Peer):
     #LOGIN=================================================================================================================
     def send_login(self):
         """ Send a request to server to login peer's information. """
-        print("Login info: ", self.name)
         data = {
             'peername': self.name,
             'host': self.serverhost,
@@ -97,19 +88,15 @@ class Client(Peer):
         print(self.server_info)
         self.socket_sending(self.server_info, msgtype='LOGIN', msgdata=data)
         self.server_sending(self.server_info, msgtype='CONNECT', msgdata = connect)
-
+        
 
      #login success notification
     def login_success(self, msgdata):
         """ Processing received message from server: Successful registration on the server. """
         self.friendlist = msgdata["friend"].split(', ')
-        self.friend = []
-        for f in msgdata:
-            self.friend.append(msgdata["friend"])
         print(self.friendlist)
         print('login Successful.')
         self.send_listpeer()
-        self.logincheck = True
 
     #login failed notification
     def login_fail(self, msgdata):
@@ -137,7 +124,6 @@ class Client(Peer):
         # print(msgdata['peerlist'])
         for peername, peer_info in msgdata['peerlist'].items():
             print('peername: ' + peername)
-            self.load_peerlist.append(peername)
 
     #Display all peers available
     def display_all_peers1(self, msgdata):
@@ -174,15 +160,14 @@ class Client(Peer):
             print(x + " ")
         return grouplist # Return in list of group chat
 
-    #======================================================================================================================
+    #======================================================================================================================  
 
     #ADD FRIEND============================================================================================================
     def send_addfriend(self, peername):
-        print("Huhu")
         if peername not in self.friendlist:
             try:
                 server_info = self.connectable_peer[peername]
-            except KeyError:
+            except KeyError: 
                 print('This peer ({}) is not logined.'.format(peername))
             else:
                 data = {
@@ -196,7 +181,6 @@ class Client(Peer):
 
      #Receive chat message request
     def receive_addfriend(self, msgdata):
-        print("Huhu2")
         """ Processing received chat request message from peer. """
         peername = msgdata['peername']
         host, port = msgdata['host'], msgdata['port']
@@ -225,7 +209,6 @@ class Client(Peer):
     def addfriend_accept(self, msgdata):
         """ Processing received accept chat request message from peer.
             Add the peer to collection of connected peers. """
-        print("Huhu3")
         username = msgdata['username_send']
         host = msgdata['host_send']
         port = msgdata['port_send']
@@ -233,29 +216,26 @@ class Client(Peer):
         print('add friend request accept: {} --- {}:{}'.format(username, host, port))
         print(friend.split(', '))
         self.send_login()
-        self.friend_list()
 
     def addfriend_refuse(self, msgdata):
         """ Processing received refuse chat request message from peer. """
         print('ADD FRIEND REFUSE!')
 
     def accept_request(self):
-        print("Huhu4")
         self.agree = True
         self.send_login()
-        self.friend_list()
-
+    
     def refuse_request(self):
         self.agree = False
-    #======================================================================================================================
-
+    #======================================================================================================================  
+    
     #REQUEST===============================================================================================================
     def send_chat_request(self, peername):
         """ Send a chat request to peer. """
         if peername not in self.peerlist and peername in self.friendlist:
             try:
                 server_info = self.connectable_peer[peername]
-            except KeyError:
+            except KeyError: 
                 print('This peer ({}) is not registered or not one of your friend.'.format(peername))
             else:
                 data = {
@@ -302,23 +282,20 @@ class Client(Peer):
         print('chat accept: {} --- {}:{}'.format(peername, host, port))
         self.peerlist[peername] = (host, port)
         self.send_listpeer()
-
+    
     #Refuse request
     def chat_refuse(self, msgdata):
         """ Processing received refuse chat request message from peer. """
         print('CHAT REFUSE!')
-
+    
     def accept_request(self):
         self.agree = True
         self.send_listpeer()
-
+    
     def refuse_request(self):
         self.agree = False
-
-#    def rename_peer(self, newname):
-#        self.name = newname
     #======================================================================================================================
-
+    
     #CHAT==================================================================================================================
     #Send chat message -- 1person
     def send_chat_message(self, peername, message):
@@ -355,8 +332,6 @@ class Client(Peer):
         peername = msgdata['peername']
         if peername in self.peerlist:
             print(peername +' : '+ msgdata['message'])
-        self.new_message = msgdata['message']
-        self.new_message_check = True
             # return self.message_format.format(peername=peername, message=msgdata['message'])
     #======================================================================================================================
 
@@ -367,7 +342,7 @@ class Client(Peer):
         filenum = int(msgdata['filenum'])
         curnum = int(msgdata['curnum'])
         filedata = msgdata['filedata']
-
+        
         key = peername + '_' + filename
         if self.file_data.get(key) is None:
             self.file_data[key] = [None] * filenum
@@ -400,7 +375,7 @@ class Client(Peer):
                 self.socket_sending(peer_info, msgtype='FILE', msgdata=data)
     #======================================================================================================================
 
-    #DISCONNECT BETWEEN PEERS =============================================================================================
+    #DISCONNECT BETWEEN PEERS ============================================================================================= 
     #Send disconnect request
     def send_disconnect(self, peername):
         """ Send a disconnect request to peer. """
@@ -420,8 +395,8 @@ class Client(Peer):
         peername = msgdata['peername']
         if peername in self.peerlist:
             print('Disconnected from {}'.format(peername))
-            del self.peerlist[peername]
-    #======================================================================================================================
+            del self.peerlist[peername]   
+
 
 #GROUP CHAT ===========================================================================================================
 
@@ -487,6 +462,7 @@ class Client(Peer):
        return msgdata['message']
    #======================================================================================================================
 
+
     #LOG OUT ==============================================================================================================
     def send_exit_network(self):
         """ Send a request to server to quit P2P network. """
@@ -509,7 +485,7 @@ class Client(Peer):
             pass
         except:
             pass
-        sys.exit()
+        sys.exit()    
     #======================================================================================================================
 
     # MENU ================================================================================================================
@@ -533,94 +509,94 @@ class Client(Peer):
         print('15. EXIT NETWORK')
         print('16. EXIT SYSTEM')
         print('17. HELP MENU')
-
+        
     #======================================================================================================================
     # Analyze the cmd input and direct it to the mapping function
     def run(self):
         atexit.register(self.system_exit)  # Prevent program being interupt and cannot exit
-
-        t = threading.Thread(target=self.receive)
+        
+        t = threading.Thread(target=self.receive)  
         t.daemon=True
         t.start()
-
+        
         self.menu()
-#        while True:
-#            option = input("please choose an option : \n")
-#            match option:
-#                case '0':
-#                    self.send_register()
-#                case '1':
-#                    self.send_login()
-#                case '2':
-#                    self.send_listpeer()
-#                case '3':
-#                    peername = input("Please input the username you want to add friend: ")
-#                    self.send_addfriend(peername)
-#                case 'yes':
-#                    self.accept_request()
-#                case 'no':
-#                    self.refuse_request()
-#                case '4':
-#                    self.friend_list()
-#                case '5':
-#                    peername = input("Please input the peer you want to connect: ")
-#                    self.send_listpeer()
-#                    self.send_chat_request(peername)
-#                case '6':
-#                    self.list_connected_peer()
-#                case '7':
-#                    peername = input("Please input the peer you want to chat: ")
-#                    while True:
-#                        message = input("Type the message <Type [!END] to stop chat> : ")
-#                        if message == '!END':
-#                            break
-#                        elif message == '!SWITCH':
-#                            message = ""
-#                            peername = input("Please input the peer you want to chat: ")
-#                        self.send_chat_message(peername, message)
-#                case '8':
-#                    message = input("Type the message: ")
-#                    self.send_chatall_message(message)
-#                case '9':
-#                    peername = input("Please input the peer you want to send file: ")
-#                    filename = input("Type the file path: ")
-#                    self.send_file(peername, filename)
-#                case '10':
-#                    groupname = input("Enter the name you want to set: ")
-#                    self.send_create_groupchat(groupname)
-#                case '11':
-#                    peername = input("Enter the peer you want to add ")
-#                    groupname = input("Enter the group you want to add: ")
-#                    self.addmember(peername, groupname)
-#                case '12':
-#                    self.send_groupchat_list()
-#                case '13':
-#                    groupname = input("Enter the name of group you want to chat: ")
-#                    while True:
-#                        message = input("Type the message <Type [!END] to stop>: ")
-#                        if message == '!END':
-#                            break
-#                        self.group_chat(groupname, message)
-#                case '14':
-#                    peername = input("Please input the peer you want to disconnect: ")
-#                    self.send_disconnect(peername)
-#                case '15':
-#                    self.send_exit_network()
-#                case '16':
-#                    self.system_exit()
-#                case '17':
-#                    self.menu()
+        while True:
+            option = input("please choose an option : \n")
+            match option:
+                case '0':
+                    self.send_register()
+                case '1':
+                    self.send_login()
+                case '2':
+                    self.send_listpeer()
+                case '3':
+                    peername = input("Please input the username you want to add friend: ")
+                    self.send_addfriend(peername)
+                case 'yes':
+                    self.accept_request()
+                case 'no':
+                    self.refuse_request()
+                case '4':
+                    self.friend_list()
+                case '5':
+                    peername = input("Please input the peer you want to connect: ")
+                    self.send_listpeer()
+                    self.send_chat_request(peername)
+                case '6':
+                    self.list_connected_peer()
+                case '7':
+                    peername = input("Please input the peer you want to chat: ")
+                    while True:
+                        message = input("Type the message <Type [!END] to stop chat> : ")
+                        if message == '!END':
+                            break
+                        elif message == '!SWITCH':
+                            message = ""
+                            peername = input("Please input the peer you want to chat: ")
+                        self.send_chat_message(peername, message)
+                case '8':
+                    message = input("Type the message: ")
+                    self.send_chatall_message(message)
+                case '9':
+                    peername = input("Please input the peer you want to send file: ")
+                    filename = input("Type the file path: ")
+                    self.send_file(peername, filename)
+                case '10':
+                    groupname = input("Enter the name you want to set: ")
+                    self.send_create_groupchat(groupname)
+                case '11':
+                    peername = input("Enter the peer you want to add ")
+                    groupname = input("Enter the group you want to add: ")
+                    self.addmember(peername, groupname)
+                case '12':
+                    self.send_groupchat_list()
+                case '13':
+                    groupname = input("Enter the name of group you want to chat: ")
+                    while True:
+                        message = input("Type the message <Type [!END] to stop>: ")
+                        if message == '!END':
+                            break
+                        self.group_chat(groupname, message)
+                case '14':
+                    peername = input("Please input the peer you want to disconnect: ")
+                    self.send_disconnect(peername)
+                case '15':
+                    self.send_exit_network()
+                case '16':
+                    self.system_exit()
+                case '17':
+                    self.menu()
 
 
 
-#if __name__ == '__main__':
-#    while True:
-#        try:
-#            serverport = int(input('Please choose a serverport (1024 -> 49151): '))
-#            peername = input('Type in your name: ')
-#            client = Client(peername=peername, serverport=serverport)
-#            client.run()
-#        except WindowsError as e:
-#            if e.winerror == 10048:
-#                print('ERROR when using username or port')
-#                print('Please redo in again')
+if __name__ == '__main__':
+    while True:
+        try:
+            serverport = int(input('Please choose a serverport (1024 -> 49151): '))
+            peername = input('Type in your name: ')
+            client = Client(peername=peername, serverport=serverport)
+            client.run()
+        except WindowsError as e:
+            if e.winerror == 10048:
+                print('ERROR when using username or port')
+                print('Please redo in again')
