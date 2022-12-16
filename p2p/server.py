@@ -1,63 +1,113 @@
 import socket
 import json
 import threading
-from base import Peer
+from data import Peer
 import pymongo
 from pymongo import MongoClient
 
 cluster = MongoClient("mongodb+srv://thoxoantit2410:trungchanh2410@p2p-chat.psyodx0.mongodb.net/?retryWrites=true&w=majority")
 db = cluster["P2P-chat"]
 collection = db["userlist"]
+groupchat = db["groupchat"]
 
-class ClientThread(threading.Thread):
-    def __init__(self,clientAddress,clientsocket):
-        threading.Thread.__init__(self)
-        self.csocket = clientsocket
-        print ("New connection added: ", clientAddress)
 
-        print ("Connection from : ", clientAddress)
-    
+
 
 class Server(Peer):
     """ Server implementation of P2P chat system. """
     def __init__(self, serverhost='localhost', serverport=30000): #server IP
-        self.serverhost, self.serverport = serverhost, int(serverport)
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((serverhost, int(serverport)))
-        self.peerlist = {}
-        self.msg_func_handle = {}
+        super(Server, self).__init__(serverhost, serverport)
         msg_func_handle = {
             'REGISTER': self.register,
             'LOGIN': self.login,
             'ACCEPT_ADDFRIEND':self.accept_addfriend,
             'PEERLIST': self.listpeer,
             'EXIT_NETWORK': self.exit_network,
-            'CONNECT':self.connect
+            'CONNECT':self.connect,
+            'CREATE_GROUPCHAT':self.create_groupchat,
+            'GROUPCHAT_LIST':self.groupchat_list,
+            'ADD_MEMBER':self.add_member,
+            'REQUEST_GROUP_MEMBER':self.request_group_member,
         }
         for message_type, func in msg_func_handle.items():
             self.func_assign(message_type, func)      
-
-    def func_assign(self, message_type, func):
-        self.msg_func_handle[message_type] = func
     
-    def classifier(self, msg):
-        type_ = msg['msgtype']
-        data_ = msg['msgdata']
-        self.msg_func_handle[type_](data_)
-    
-    def receive(self):
-        self.socket.listen()
-        while True:  #--
-            conn, addr = self.socket.accept()
-            buf = conn.recv(2048)
-            msg = json.loads(buf.decode('utf-8'))
-            self.classifier(msg)
-            newthread = ClientThread(addr, conn)
-            newthread.start()
-            print(threading.active_count())
+    def connect(self,msgdata):
+        msg = msgdata['msg']
+        print(msg)
 
-    def connect(self, msgdata):
-        pass
+    def create_groupchat(self,msgdata):
+        groupname = msgdata['groupname']
+        member = msgdata['member']
+        host = msgdata['host']
+        port = msgdata['port']
+        if groupchat.find_one({"groupname":groupname}):
+            self.socket_sending((host,port), msgtype = 'CREATE_GROUPCHAT_ERROR',msgdata={})
+        else:
+            group = {"groupname":groupname, 'member':member}
+            groupchat.insert_one(group)
+            self.socket_sending((host,port), msgtype = 'CREATE_GROUPCHAT_SUCCESS',msgdata={})
+    
+    def groupchat_list(self,msgdata):
+        peername = msgdata['peername']
+        host = msgdata['host']
+        port = msgdata['port']
+        member:list
+        groupchat_list = ""
+        '''for group in groupchat:
+            member = group['member'].split(', ')
+            for x in member:
+                if x == peername:
+                    groupchat_list = groupchat_list + ', ' + group['groupname']'''
+        group = groupchat.find()
+        for item in group:
+            member  =item['member'].split(', ')
+            for x in member:
+                if x==peername:
+                    if groupchat_list == "":
+                        groupchat_list = groupchat_list + item['groupname']
+                    else:
+                        groupchat_list = groupchat_list + ', ' + item['groupname']
+        print(groupchat_list)
+        data = {
+            'grouplist':groupchat_list
+        }
+        self.socket_sending((host,port),msgtype='GROUPCHATLIST',msgdata = data)
+        
+    def add_member(self,msgdata):
+        peername = msgdata['peername']
+        groupname = msgdata['groupname']
+        host = msgdata['host']
+        port = msgdata['port']
+        group = groupchat.find({'groupname':groupname})
+        content = ""
+        for x in group:
+            content = x['member']
+        groupchat.update_many({"groupname":groupname},{"$set":{"member":content + ", " + peername}})
+        self.socket_sending((host,port),msgtype='ADD_MEMBER_SUCCESS',msgdata = {})
+
+    def request_group_member(self,msgdata):
+        print('hello')
+        host = msgdata['host']
+        port = msgdata['port']
+        peername = msgdata['peername']
+        groupname = msgdata['groupname']
+        message = msgdata['message']
+        group = groupchat.find({'groupname':groupname})
+        content = ""
+        for x in group:
+            content = x['member']
+        data = {
+            'peername':peername,
+            'message':message
+        }
+        member = content.split(', ')
+        for peername, peer_info in self.peerlist.items():
+            for mem in member:
+                print(peername + " : " + str(peer_info))
+                if peername == mem:
+                    self.socket_sending(peer_info, msgtype='GROUP_CHAT',msgdata=data)
+
     def exit_network(self, msgdata):
         peername = msgdata['peername']
         if peername in self.peerlist:
@@ -127,19 +177,24 @@ class Server(Peer):
 
     def run(self, mode = 0):
         while True:
-            self.receive()
-            
+            self.socket.listen()
+            t = threading.Thread(target=self.receive)
+            t.daemon = True
+            t.start()
             print("Type <end server> to stop the server.")
-            print(threading.active_count())
+            result = collection.find({"username":"trungchanh"})
+            for results in result:
+                print(results["host"])
             if (mode == 1):
                 print("DEBUG_MODE: ON")
                 while True:
+                    print(threading.enumerate())
+                    print(threading.active_count())
                     cmd = input()
                     if cmd=='end server':
                         break
-                    if cmd == 'thread':
-                        print(threading.active_count())
-        
+                    if cmd == 'listpeer':
+                        print(self.listpeer)
 
 
 if __name__ == '__main__':

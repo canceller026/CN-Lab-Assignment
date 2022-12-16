@@ -12,17 +12,13 @@ from base import Peer
 
 class Client(Peer):
     def __init__(self, peername=None, serverhost='localhost', serverport=40000, server_info=('localhost', 30000)): #custom server ip
-        self.serverhost, self.serverport = serverhost, int(serverport)
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((serverhost, int(serverport)))
-        self.socket.listen(100)
-        self.peerlist = {}
-        self.msg_func_handle = {}
+        super(Client, self).__init__(serverhost, serverport)
+        self.socket.listen()
         self.server_info = server_info  # Server Address
-
         self.name = peername if peername is not None else ':'.join((serverhost, serverport))
         self.connectable_peer = {}
         friendlist:list = []
+        grouplist:list= []
         # example name: 192.168.0.1:30000
         msg_func_handle = {
             'CHAT': self.receive_message,
@@ -37,8 +33,15 @@ class Client(Peer):
             'ADD_FRIEND_REQUEST':self.receive_addfriend,
             'ADD_FRIEND_ACCEPT':self.addfriend_accept,
             'ADD_FRIEND_REFUSE':self.addfriend_refuse,
+            'CREATE_GROUPCHAT_SUCCESS':self.create_groupchat_success,
+            'CREATE_GROUPCHAT_ERROR':self.create_groupchat_error,
+            'GROUPCHATLIST':self.groupchatlist,
+            'ADD_MEMBER_SUCCESS':self.add_member_success,
+            #'SEND_GROUP_CHAT':self.send_group_chat,
+            'GROUP_CHAT':self.receive_group_chat,
             'DISCONNECT': self.disconnect,
             'FILE': self.file_transfer,
+
         }
         for message_type, func in msg_func_handle.items():
             self.func_assign(message_type, func)
@@ -47,21 +50,6 @@ class Client(Peer):
         self.agree = None
         
         self.file_data = {}
-
-    def func_assign(self, message_type, func):
-        self.msg_func_handle[message_type] = func
-    
-    def classifier(self, msg):
-        type_ = msg['msgtype']
-        data_ = msg['msgdata']
-        self.msg_func_handle[type_](data_)
-    
-    def receive(self):
-        while True:  #--
-            conn, addr = self.socket.accept()
-            buf = conn.recv(2048)
-            msg = json.loads(buf.decode('utf-8'))
-            self.classifier(msg)
 
     #REGISTER =============================================================================================================
     def send_register(self):
@@ -95,9 +83,11 @@ class Client(Peer):
             'host': self.serverhost,
             'port': self.serverport
         }
+        connect = {'msg':'Hello from ' + self.name + ':' + str(self.serverhost) + " - " + str(self.serverport)}
         print(self.server_info)
-        
         self.socket_sending(self.server_info, msgtype='LOGIN', msgdata=data)
+        self.server_sending(self.server_info, msgtype='CONNECT', msgdata = connect)
+        
 
      #login success notification
     def login_success(self, msgdata):
@@ -147,6 +137,8 @@ class Client(Peer):
     #Show list connected peers
     def friend_list(self):
         """ Output all connected peers information. """
+        if self.friend_list == []:
+            print("You have no friend")
         print(self.friendlist)
 
     #Show list connected peers
@@ -154,6 +146,19 @@ class Client(Peer):
         """ Output all connected peers information. """
         for peername, peer_info in self.peerlist.items():
             print('peername: ' + peername + '---' + peer_info[0] + ':' + str(peer_info[1]))
+    
+    def send_groupchat_list(self):
+        data = {
+            'peername': self.name,
+            'host': self.serverhost,
+            'port': self.serverport
+        }
+        self.socket_sending(self.server_info, msgtype='GROUPCHAT_LIST', msgdata=data)
+    
+    def groupchatlist(self,msgdata):
+        grouplist = msgdata['grouplist'].split(', ')
+        for x in grouplist:
+            print(x + " ")
     #======================================================================================================================  
 
     #ADD FRIEND============================================================================================================
@@ -392,6 +397,67 @@ class Client(Peer):
             del self.peerlist[peername]   
     #======================================================================================================================
 
+
+    #GROUP CHAT ===========================================================================================================
+    def send_create_groupchat(self, groupname):
+        """ Send a request to server to login peer's information. """
+        data = {
+            'groupname': groupname,
+            'member':f'{self.name}',
+            'host': self.serverhost,
+            'port': self.serverport
+        }
+        self.socket_sending(self.server_info, msgtype='CREATE_GROUPCHAT', msgdata = data)
+
+    #register success notification
+    def create_groupchat_success(self, msgdata):
+        print('Groupchat created Successful.')
+
+    #register failed notification
+    def create_groupchat_error(self, msgdata):
+        print('Groupchat created Error.')
+
+    def addmember(self, peername, groupname):
+        data = {
+            'peername':peername,
+            'groupname':groupname,
+            'host':self.serverhost,
+            'port':self.serverport
+        }
+        self.socket_sending(self.server_info, msgtype='ADD_MEMBER', msgdata=data)
+
+    def add_member_success(self,msgdata):
+        print("Member added successfully")
+
+    def group_chat(self,groupname, message):
+        data={
+            'host':self.serverhost,
+            'port':self.serverport,
+            'peername':self.name,
+            'groupname':groupname,
+            'message':message
+        }
+        self.socket_sending(self.server_info, msgtype='REQUEST_GROUP_MEMBER', msgdata=data)
+    
+    '''def send_group_chat(self,msgdata):
+        member:list = msgdata['member'].split(', ')
+        message = msgdata['message']
+        data = {
+            'peername':self.name,
+            'message':message
+        }
+        for peername, peer_info in self.peerlist.items():
+            for mem in member:
+                if peername == mem:
+                    self.socket_sending(peer_info, msgtype='GROUP_CHAT', msgdata= data)'''
+
+    def receive_group_chat(self, msgdata):
+        """ Processing received chat message from peer."""
+        peername = msgdata['peername']
+        print(peername +' : '+ msgdata['message'])
+    #======================================================================================================================
+
+
     #LOG OUT ==============================================================================================================
     def send_exit_network(self):
         """ Send a request to server to quit P2P network. """
@@ -430,10 +496,15 @@ class Client(Peer):
         print('7. CHAT')
         print('8. CHAT ALL')
         print('9. SEND FILE')
-        print('10. DISCONNECT PEER')
-        print('11. EXIT NETWORK')
-        print('12. EXIT SYSTEM')
-        print('13. HELP MENU')
+        print('10. CREATE GROUP CHAT')
+        print('11. ADD MEMBER')
+        print('12. SHOW ALL OF YOUR GROUPS')
+        print('13. GROUP CHATTING')
+        print('14. DISCONNECT PEER')
+        print('15. EXIT NETWORK')
+        print('16. EXIT SYSTEM')
+        print('17. HELP MENU')
+
         
     #======================================================================================================================
     # Analyze the cmd input and direct it to the mapping function
@@ -443,7 +514,6 @@ class Client(Peer):
         t = threading.Thread(target=self.receive)  
         t.daemon=True
         t.start()
-        self.socket_connect(self.server_info, msgtype='CONNECT',msgdata={})
         
         self.menu()
         while True:
@@ -488,15 +558,30 @@ class Client(Peer):
                     filename = input("Type the file path: ")
                     self.send_file(peername, filename)
                 case '10':
+                    groupname = input("Enter the name you want to set: ")
+                    self.send_create_groupchat(groupname)
+                case '11':
+                    peername = input("Enter the peer you want to add ")
+                    groupname = input("Enter the group you want to add: ")
+                    self.addmember(peername, groupname)
+                case '12':
+                    self.send_groupchat_list()
+                case '13':
+                    groupname = input("Enter the name of group you want to chat: ")
+                    while True:
+                        message = input("Type the message <Type [!END] to stop>: ")
+                        if message == '!END':
+                            break
+                        self.group_chat(groupname, message)
+                case '14':
                     peername = input("Please input the peer you want to disconnect: ")
                     self.send_disconnect(peername)
-                case '11':
+                case '15':
                     self.send_exit_network()
-                case '12':
+                case '16':
                     self.system_exit()
-                case '13':
+                case '17':
                     self.menu()
-
 
 
 if __name__ == '__main__':
