@@ -24,9 +24,12 @@ class Client(Peer):
 
         self.new_message_check = False
         self.new_message = ""
+        self.new_file_check = False
+        self.new_file = []
         self.load_peerlist = []
         self.friend = []
         self.connected = []
+        self.cr_group = []
         self.check_friend_request = None
 
         # example name: 192.168.0.1:30000
@@ -170,8 +173,10 @@ class Client(Peer):
 
     def groupchatlist(self,msgdata):
         grouplist = msgdata['grouplist'].split(', ')
+        self.cr_group = []
         for x in grouplist:
             print(x + " ")
+            self.cr_group.append(x)
         return grouplist # Return in list of group chat
 
     #======================================================================================================================
@@ -373,6 +378,8 @@ class Client(Peer):
             self.file_data[key] = [None] * filenum
         self.file_data[key][curnum] = filedata
         print(self.file_data[key])
+        self.new_file = self.file_data[key]
+        self.new_file_check = True
 
     def send_file(self, peername, filename):
         try:

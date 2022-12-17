@@ -25,6 +25,7 @@ class MainWindow(QMainWindow):
     friend_namelist = []
     fake_connected = []
     friend_checklist = []
+    group_list = []
 
     serverport = random.randint(10000, 12000)
     port = serverport
@@ -110,7 +111,7 @@ class MainWindow(QMainWindow):
         self.acc_friend = 0
         self.friend_checklist = []
         self.reset_chat()
-        self.send_button.hide()
+#        self.send_button.hide()
         self.fake_listpeer = self.my_client.load_peerlist
         if self.my_client.load_peerlist.__contains__(self.username):
             self.fake_listpeer.remove(self.username)
@@ -311,6 +312,16 @@ class MainWindow(QMainWindow):
                 self.receive_message(self.my_client.new_message)
                 self.my_client.new_message = ""
                 print("Got it")
+            self.read_file()
+
+    def read_file(self):
+        if self.homepage_status:
+            if self.my_client.new_file_check:
+                self.my_client.new_file_check = False
+                for line in self.my_client.new_file:
+                    self.receive_message("File: " + line)
+                self.my_client.new_file = []
+                print("Got file")
 
     def receive_message(self, f_message):
         if f_message != "":
@@ -440,7 +451,7 @@ class MainWindow(QMainWindow):
         self.friend_namelist = self.my_client.friendlist
         if self.friend_namelist.__contains__(self.username):
             self.friend_namelist.remove(self.username)
-        self.friend_list_update()
+        self.group_list_update()
 
     def reset_chat(self):
         print("Reset")
@@ -482,21 +493,110 @@ class MainWindow(QMainWindow):
         self.message_plainTextEdit.setPlainText("")
         self.search_plainTextEdit.setPlainText("")
         self.file_plainTextEdit.setPlainText("")
-        self.real_fresh()
-        self.friend_list_update()
+        self.refresh_group()
+        self.group_list_update()
 
     def group_button_control(self):
         print("button_ctrl")
         self.logout_button.clicked.connect(lambda: self.open_loginpage())
-        self.search_button.clicked.connect(lambda: self.search_user())
+        self.search_button.clicked.connect(lambda: self.create_group())
         self.exit_btn.clicked.connect(lambda: sys.exit())
         self.change_friend()
         self.send_button.clicked.connect(lambda: self.send_message())
         self.yes_button.clicked.connect(lambda: self.send_yes())
         self.no_button.clicked.connect(lambda: self.send_no())
         self.request_button.clicked.connect(lambda: self.send_request())
-        self.refresh_button.clicked.connect(lambda: self.real_fresh())
+        self.refresh_button.clicked.connect(lambda: self.refresh_group())
         self.back_button.clicked.connect(lambda: self.open_homepage())
+
+    def create_group(self):
+        searchname = self.search_plainTextEdit.toPlainText()
+        print("Create group: ", searchname)
+        self.my_client.send_create_groupchat(searchname)
+        if searchname != self.user_button_1.text():
+            self.Item_1.hide()
+        if searchname != self.user_button_2.text():
+            self.Item_2.hide()
+        if searchname != self.user_button_3.text():
+            self.Item_3.hide()
+        if searchname != self.user_button_4.text():
+            self.Item_4.hide()
+        if searchname != self.user_button_5.text():
+            self.Item_5.hide()
+        if searchname != self.user_button_6.text():
+            self.Item_6.hide()
+        if searchname != self.user_button_7.text():
+            self.Item_7.hide()
+        if searchname == "":
+            print(self.acc_friend)
+            if self.acc_friend > 0:
+                self.Item_1.show()
+            if self.acc_friend > 1:
+                self.Item_2.show()
+            if self.acc_friend > 2:
+                self.Item_3.show()
+            if self.acc_friend > 3:
+                self.Item_4.show()
+            if self.acc_friend > 4:
+                self.Item_5.show()
+            if self.acc_friend > 5:
+                self.Item_6.show()
+            if self.acc_friend > 6:
+                self.Item_7.show()
+
+    def refresh_group(self):
+        self.my_client.send_groupchat_list()
+        self.group_list = self.my_client.cr_group
+        self.friend_namelist = self.my_client.friendlist
+        self.group_list_update()
+
+    def group_list_update(self):
+        self.Item_1.hide()
+        self.Item_2.hide()
+        self.Item_3.hide()
+        self.Item_4.hide()
+        self.Item_5.hide()
+        self.Item_6.hide()
+        self.Item_7.hide()
+        self.acc_friend = 0
+        for group in self.group_list:
+            self.acc_friend = self.acc_friend + 1
+            self.friend_checklist.append(False)
+        if self.acc_friend > 0:
+            self.user_button_1.setText(self.fake_listpeer[0])
+            self.Item_1.show()
+            if self.friend_namelist.__contains__(self.user_button_1.text()):
+                self.user_button_1.setStyleSheet('color: green')
+        if self.acc_friend > 1:
+            self.user_button_2.setText(self.fake_listpeer[1])
+            self.Item_2.show()
+            if self.friend_namelist.__contains__(self.user_button_2.text()):
+                self.user_button_2.setStyleSheet('color: green')
+        if self.acc_friend > 2:
+            self.user_button_3.setText(self.fake_listpeer[2])
+            self.Item_3.show()
+            if self.friend_namelist.__contains__(self.user_button_3.text()):
+                self.user_button_3.setStyleSheet('color: green')
+        if self.acc_friend > 3:
+            self.user_button_4.setText(self.fake_listpeer[3])
+            self.Item_4.show()
+            if self.friend_namelist.__contains__(self.user_button_4.text()):
+                self.user_button_4.setStyleSheet('color: green')
+        if self.acc_friend > 4:
+            self.user_button_5.setText(self.fake_listpeer[4])
+            self.Item_5.show()
+            if self.friend_namelist.__contains__(self.user_button_5.text()):
+                self.user_button_5.setStyleSheet('color: green')
+        if self.acc_friend > 5:
+            self.user_button_6.setText(self.fake_listpeer[5])
+            self.Item_6.show()
+            if self.friend_namelist.__contains__(self.user_button_6.text()):
+                self.user_button_6.setStyleSheet('color: green')
+        if self.acc_friend > 6:
+            self.user_button_7.setText(self.fake_listpeer[6])
+            self.Item_7.show()
+            if self.friend_namelist.__contains__(self.user_button_7.text()):
+                self.user_button_7.setStyleSheet('color: green')
 
 
 class GUI:
