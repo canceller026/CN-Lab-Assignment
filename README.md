@@ -1,7 +1,7 @@
 # CN-Lab-Assignment
 # Chat application
 
-It is a hybrid chat application between client-server and peer-to-peer (P2P).
+It is a hybrid chat application between client-server and peer-to-peer (P2P).<br/>
 ![Model](model.png)
 * Client-Server :
     * **Accounts registration**<br/>
