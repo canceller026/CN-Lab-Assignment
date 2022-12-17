@@ -23,7 +23,21 @@ It is a hybrid chat application between client-server and peer-to-peer (P2P).<br
     
 
 ## How to Use It?
-* Clone the repo.
-* Run 'server.py'.
-* Run 'main.py'.
-* Chat!
+First, clone the repository
+```
+git clone https://github.com/canceller026/CN-Lab-Assignment.git
+```
+Then start the server
+```
+cd p2p
+python server.py
+```
+
+Install pyqt5 package before start the chat application
+```
+cd p2p
+pip install pyqt5
+python main.py
+```
+
+Finally, register/login and start chatting with your friends.
